@@ -111,7 +111,7 @@ $ npm install -D hermes-adaptor
 Create a `hermes.js` file.
 
 ```javascript
-const adaptor = require('hermes-adaptor)
+const adaptor = require('hermes-adaptor')
 
 adaptor.init({
   bridgeHost: 'my-hermes-bridge-domain.com',

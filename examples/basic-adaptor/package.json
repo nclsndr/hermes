@@ -1,0 +1,19 @@
+{
+  "name": "basic-adaptor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "hermes": "node hermes.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "hermes-adaptor": "0.0.8"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.3"
+  }
+}

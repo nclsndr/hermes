@@ -1,6 +1,6 @@
 # Hermes
 
-#### Listen to the 🌐outside world 🌍 from your 🏡 bedroom 🛌,
+#### Listen to the outside world 🌍 from your bedroom 🛌,
 ##### 📡 HTTP request forwarding with no hassle
 
 
@@ -17,50 +17,134 @@ Then Hermes comes and provides two modules:
 
 When the response is emitted from the *local server*, it brings the response back to the *provider* following the same logic.
 
+### Execution modes
 #### 1 to 1 communication
 
-
-![Basic](https://github.com/chance-get-yours/hermes/blob/docs/docs/assets/basic.jpg)
+![](https://github.com/chance-get-yours/hermes/blob/master/docs/assets/basic.jpg?raw=true)
 
 #### Concurrency
 
 Hermes allows **concurrent calls among clients**. By default, the first response received from any client (*adaptor*) will be used as the final response for the *provider*. This feature is particularly useful for teams of developers working at the same time.
 
-![Concurrent](https://github.com/chance-get-yours/hermes/blob/docs/docs/assets/concurrent.jpg)
+![](https://github.com/chance-get-yours/hermes/blob/master/docs/assets/concurrent.jpg?raw=true)
 
 ## Usage
 
-**⚠️ The packages are not available yet**
-
 ---
-### Bridge: Server side
-You need to procure any kind of server able to run node 8+. Then it's up to you to enhance it with NGNIX if you need DNS resolution.
+### 🌍 Bridge: Server side
+You need to procure any kind of server able to 1. run node 8+, 2. allow specific port access (different from 80 and 443) 
+
+> All the information provided here are gathered into this [example directory](https://github.com/chance-get-yours/hermes/tree/master/examples/basic-bridge)
+
+#### 1. Create a new project
 
 ```
-$ npm | yarn install hermes-bridge
+$ mkdir basic-bridge && cd basic-bridge
+$ npm init
 ```
 
----
-### Adaptor: Local stack
-
-Into your local server directory:
+#### 2. Install hermes-bridge and dotenv
 
 ```
-$ npm | yarn install -D hermes-adaptor
+$ npm install hermes-bridge dotenv
 ```
 
-Create a `hermes.js` file.
+*We encourage you to use [dotenv](https://www.npmjs.com/package/dotenv) package in order to protect your sensitive data from being published online. NB: .env should be listed into your `.gitignore`*
 
-```
-const adaptor = require('hermes-adaptor)
-adaptor.init({
-    [To define]
+#### 3. Create the configuration
+
+```javascript
+// index.js
+const createBridgeServer = require('hermes-bridge')
+
+// Response used when no adaptors are connected (some providers like Facebook, accept 2xx status code only)
+const responseFallback = {
+  statusCode: 500,
+  headers: { 'content-type': 'application/json; charset=utf-8' },
+  body: JSON.stringify({ error: 'No local server provided' })
+}
+
+createBridgeServer({
+  httpPort: 8000, // make sure you can acess from outside of your machine
+  socketPort: 9000, // this port will be reused for the adaptor configuration
+  loggerLevel: 'verbose', // 'info'
+  clients: {
+    adaptors: {
+      isAuthRequired: true, // enable/disable authentication check
+      authTokens: tokens // [stringToken]
+    }
+  },
+  defaultResponse: responseFallback // by default, hermes provide the fallback described above
 })
 ```
 
-### Preview
 
-![CLI-preview](https://github.com/chance-get-yours/hermes/blob/docs/docs/assets/cli-demo.gif)
+#### 4. 🚀 Launch it!
+
+```
+$ node index.js
+```
+
+**Notes**
+
+- For a basic DNS resolution you can use our [NGINX configuration file](https://github.com/chance-get-yours/hermes/blob/master/examples/basic-bridge/nginx.conf)
+- Some providers require to use HTTPS, we recommend to use [Let's Encrypt](https://letsencrypt.org/) with [Cerbot](https://certbot.eff.org/)
+- DNS resolution for the socket endpoint is possible but not as easy as it seems. We recommend to use the IP for configuring the adaptor.
+- [Heroku](https://www.heroku.com/) users, as far as the service doesn't allow multi-port exposure, hermes-bridge will not be compatible.
+
+
+---
+### 🛌 Adaptor: Local dev env
+The adaptor can be set in any dev environment that support NodeJS 8+.
+
+> All the information provided here are gathered into this [example directory](https://github.com/chance-get-yours/hermes/tree/master/examples/basic-adaptor)
+
+#### 1. Install hermes-adaptor
+
+Navigate to your project directory, then
+
+```
+$ npm install -D hermes-adaptor
+```
+
+#### 2. Create configuration
+Create a `hermes.js` file.
+
+```javascript
+const adaptor = require('hermes-adaptor)
+
+adaptor.init({
+  bridgeHost: 'my-hermes-bridge-domain.com',
+  bridgeSocketPort: 9000,
+  localServerProtocol: 'http',
+  localServerHost: 'localhost',
+  localServerPort: 8888,
+  maxAttempts: 10, // number of attempts to reconnect in case of network errors
+  attemptDelay: 200,
+  auth: {
+    token: 'gHmFyUkCSpGRXiWFxvLMpGYbMXvcsi', // This token has to be listed into the Bridge configurartion
+    username: 'Nico' // Up to you
+  },
+  verbose: true // logger output level
+})
+```
+
+#### 3. 🚀 Launch it!
+
+```
+$ node hermes.js
+```
+
+You need to launch your local server too if you want the all system to do his job!
+
+**Notes**
+
+- We recommend to use [concurrently](https://www.npmjs.com/package/concurrently) in order to start your dev-server in parallel with the adaptor
+- For setup testing, you can try a `curl http://my-bridge.com`, then you should receive the request on your adaptor console (verbose = true).
+
+### Hermes in action
+
+![](https://github.com/chance-get-yours/hermes/blob/master/docs/assets/cli-demo.gif?raw=true)
 
 ### Requirements
 

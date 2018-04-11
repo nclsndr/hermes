@@ -1,0 +1,34 @@
+{
+  "name": "hermes-adaptor",
+  "version": "0.0.8",
+  "description": "Link between Hermes Bridge and the local server",
+  "main": "lib/index.js",
+  "homepage": "https://github.com/chance-get-yours/hermes",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chance-get-yours/hermes"
+  },
+  "bugs": {
+    "url": "https://github.com/chance-get-yours/hermes/issues",
+    "email": "open-source@chance.co"
+  },
+  "author": "nclsndr <nclsndr1@gmail.com>",
+  "contributors": [
+    "hugoLarrousse <hugo.larrousse@gmail.com>",
+    "arnaudcoutin <a.coutin06@gmail.com>"
+  ],
+  "engines": {
+    "node": ">=8.10.0"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "clear": "^0.1.0",
+    "colors": "^1.1.2",
+    "content-type": "^1.0.2",
+    "hermes-utils": "^0.0.7",
+    "is-json": "^2.0.1",
+    "query-string": "^5.0.1",
+    "request": "^2.83.0",
+    "winston": "^2.4.0"
+  }
+}

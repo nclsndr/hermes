@@ -1,0 +1,11 @@
+{
+  "name": "provider-mock",
+  "version": "1.0.0",
+  "description": "Mock external provider requests to local server over Hermes",
+  "main": "requests.js",
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.18.0"
+  }
+}

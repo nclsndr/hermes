@@ -1,0 +1,56 @@
+{
+  "env": {
+    "node": true,
+    "jest": true
+  },
+  "extends": "standard",
+  "plugins": ["jest"],
+  "rules": {
+    "array-bracket-spacing": [2, "never"],
+    "arrow-body-style": 0,
+    "arrow-parens": [2, "as-needed"],
+    "brace-style": [2, "1tbs", { "allowSingleLine": true }],
+    "class-methods-use-this": 0,
+    "comma-dangle": [2, {
+      "arrays": "never",
+      "objects": "never",
+      "imports": "never",
+      "exports": "never",
+      "functions": "never"
+    }],
+    "curly": [2, "multi-line", "consistent"],
+    "global-require": 2,
+    "jest/no-disabled-tests": 1,
+    "jest/no-focused-tests": 2,
+    "jest/no-identical-title": 2,
+    "jest/prefer-to-have-length": 1,
+    "jest/valid-expect": 2,
+    "max-len": [2, {
+      "code": 100,
+      "tabWidth": 2,
+      "ignoreComments": true,
+      "ignoreTrailingComments": true,
+      "ignoreStrings": false,
+      "ignoreRegExpLiterals": true
+    }],
+    "newline-before-return": 0,
+    "no-confusing-arrow": [2, { "allowParens": true }],
+    "no-multiple-empty-lines": 2,
+    "no-nested-ternary": 0,
+    "no-return-assign": 2,
+    "no-underscore-dangle": 0,
+    "no-unused-vars": [2, {
+      "vars": "all",
+      "args": "after-used",
+      "varsIgnorePattern": "React"
+    }],
+    "no-useless-escape": 2,
+    "object-curly-spacing": [2, "always"],
+    "operator-linebreak": ["error", "before"],
+    "prefer-arrow-callback": 2,
+    "prefer-const": [2, {
+      "destructuring": "all"
+    }],
+    "semi": [2, "never"]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "scripts": {
+    "local-server": "node local-server/index.js",
+    "bridge": "nodemon --watch ../packages/hermes-bridge bridge.js",
+    "adaptor": "nodemon --watch ../packages/hermes-adaptor adaptor.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "nodemon": "^1.17.3"
+  },
+  "devDependencies": {
+    "async": "^2.6.0"
+  }
+}

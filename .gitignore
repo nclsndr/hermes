@@ -1,0 +1,9 @@
+# IDEs
+.idea
+.vscode
+
+# OS
+.DS_Store
+
+# NPM
+node_modules

@@ -144,7 +144,8 @@ class SocketConnection extends EventEmitter {
       ADAPTOR_TO_BRIDGE_ERROR,
       BRIDGE_REFUSED_AUTH,
       BRIDGE_ACCEPTED_AUTH,
-      BRIDGE_LOG_INFO
+      BRIDGE_LOG_INFO,
+      username
     } = communication
 
     if (BRIDGE_LOG_INFO) {
@@ -153,6 +154,7 @@ class SocketConnection extends EventEmitter {
     }
 
     if (BRIDGE_ACCEPTED_AUTH) {
+      this._username = username
       this._logger.info(`${this._username}, you are now authenticated (${this._authToken})`.green)
       this.emit(SocketConnection.ON_AUTH_SUCCESS)
     }

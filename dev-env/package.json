@@ -1,8 +1,10 @@
 {
   "scripts": {
     "local-server": "node local-server/index.js",
-    "bridge": "nodemon --watch ../packages/hermes-bridge bridge.js",
-    "adaptor": "nodemon --watch ../packages/hermes-adaptor adaptor.js"
+    "bridge": "nodemon --watch ../packages/hermes-bridge bridge.js --watch ../packages/hermes-backend --ignore ../packages/hermes-backend/data backend.js",
+    "adaptor": "nodemon --watch ../packages/hermes-adaptor adaptor.js",
+    "adaptor2": "nodemon --watch ../packages/hermes-adaptor adaptor2.js",
+    "backend": "nodemon --watch ../packages/hermes-backend --ignore ../packages/hermes-backend/data backend.js"
   },
   "author": "",
   "license": "MIT",

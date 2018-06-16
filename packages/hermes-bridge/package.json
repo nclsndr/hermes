@@ -23,6 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "colors": "^1.1.2",
+    "hermes-backend": "^0.0.7",
     "hermes-utils": "^0.0.7",
     "is-json": "^2.0.1",
     "lodash": "^4.17.5",

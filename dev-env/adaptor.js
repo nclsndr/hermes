@@ -4,10 +4,10 @@
 const createAdaptor = require('../packages/hermes-adaptor/lib/index')
 const config = require('./constants')
 
-const pickRand = arr => {
-  const int = Math.round(Math.random() * (arr.length - 1))
-  return arr[int]
-}
+// const pickRand = arr => {
+//   const int = Math.round(Math.random() * (arr.length - 1))
+//   return arr[int]
+// }
 
 createAdaptor({
   bridgeHost: config.bridge.host,
@@ -18,8 +18,7 @@ createAdaptor({
   maxAttempts: config.adaptor.maxAttempts,
   attemptDelay: config.adaptor.attemptDelay,
   auth: {
-    token: pickRand(config.adaptor.authTokens),
-    username: pickRand(config.adaptor.usernames)
+    token: 'MbhJ3SymD98byPs7zB6rEJRnG8NwCu'
   },
   verbose: true
 })

@@ -1,2 +1,5 @@
 # Yarn
 yarn.lock
+
+# file DB
+data/db.json

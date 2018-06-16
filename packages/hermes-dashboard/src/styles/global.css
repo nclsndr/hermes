@@ -1,0 +1,21 @@
+/* ------------------------------------------
+   Application global styles
+--------------------------------------------- */
+@import url('https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900');
+
+body, html {
+  font-size: 14px;
+  padding: 0;
+  height: 100%;
+}
+ol, ul {
+  list-style: none
+}
+
+body {
+  font-family: 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+}
+
+#root {
+  height: 100%;
+}

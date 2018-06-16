@@ -12,8 +12,16 @@ const BRIDGE_ACCEPTED_AUTH = 'BRIDGE_ACCEPTED_AUTH'
 // const BRIDGE_TO_ADAPTOR_SUCCESS = 'BRIDGE_TO_ADAPTOR_SUCCESS'
 // const BRIDGE_TO_ADAPTOR_ERROR = 'BRIDGE_TO_ADAPTOR_ERROR'
 
-const createAdaptor = ({ logger }) =>
-  class Adaptor extends EventEmitter {
+const createAdaptor = ({ logger, adaptorInterface }) => {
+  const {
+    ADAPTOR_UPDATE_LISTENING_STATE,
+    ADAPTOR_BULK_UPDATE_LISTENING_STATE,
+    ADAPTOR_UPDATE_EXCLUSIVE_STATE,
+    ADAPTOR_UPDATE,
+    ADAPTOR_DELETE
+  } = adaptorInterface.emitter.events
+
+  return class Adaptor extends EventEmitter {
     static get ON_ADAPTOR_RECEPTION_SUCCESS () {
       return 'ON_ADAPTOR_RECEPTION_SUCCESS'
     }
@@ -29,36 +37,70 @@ const createAdaptor = ({ logger }) =>
     static get ON_DISCONNECT () {
       return 'ON_DISCONNECT'
     }
-    constructor (socket, config) {
+    constructor (socket) {
       super()
       this.id = uuid()
       this._socket = socket
-      this._config = config
       this._socket.on('data', this.onData.bind(this))
       this._socket.on('end', this.onEnd.bind(this))
-      this.isAuth = !config.isAuthRequired
-      this.token = null
-      this.username = 'Anonymous'
+      this.isAuth = false
+      this.isListening = false
+      this.userId = null
+      this.username = null
       this.pendingRequests = []
       this.ready = true
       this.chunks = ''
       this.nextReqLength = 0
       this.accLength = 0
-      this.authTimeout = null
 
-      if (config.isAuthRequired) {
-        this.authTimeout = setTimeout(() => {
-          if (!this.isAuth) {
-            this._socket.destroy()
-            logger.verbose(`Adaptor ${this.id} auth timeout`.red)
-            this.emit(Adaptor.ON_ADAPTOR_AUTH_ERROR, { socketId: this.id })
-          }
-        }, 2000)
+      this.authTimeout = setTimeout(() => {
+        if (!this.isAuth) {
+          this._socket.destroy()
+          logger.verbose(`Adaptor ${this.id} auth timeout`.red)
+          this.emit(Adaptor.ON_ADAPTOR_AUTH_ERROR, { socketId: this.id })
+        }
+      }, 2000)
+
+      this.adaptorInterfaceUpdateListeningState = adaptor => {
+        if (adaptor.id === this.userId) {
+          this.isListening = adaptor.isListening
+        }
       }
+      adaptorInterface.emitter.on(
+        ADAPTOR_UPDATE_LISTENING_STATE, this.adaptorInterfaceUpdateListeningState)
+      this.adaptorInterfaceUpdateBulkListeningState = adaptors => {
+        adaptors
+          .filter(a => a.id === this.userId)
+          .forEach(a => {
+            this.isListening = a.isListening
+          })
+      }
+      adaptorInterface.emitter.on(
+        ADAPTOR_BULK_UPDATE_LISTENING_STATE, this.adaptorInterfaceUpdateBulkListeningState)
+      this.adaptorInterfaceUpdateExclusiveState = adaptor => {
+        this.isListening = adaptor.id === this.userId
+      }
+      adaptorInterface.emitter.on(
+        ADAPTOR_UPDATE_EXCLUSIVE_STATE, this.adaptorInterfaceUpdateExclusiveState)
+      this.adaptorDelete = ({ id }) => {
+        if (id === this.userId) {
+          this._socket.destroy()
+        }
+      }
+      adaptorInterface.emitter.on(
+        ADAPTOR_DELETE, this.adaptorDelete)
+      this.adaptorUpdate = ({ id }) => {
+        if (id === this.userId) {
+          this._socket.destroy()
+        }
+      }
+      adaptorInterface.emitter.on(
+        ADAPTOR_UPDATE, this.adaptorUpdate)
+
       logger.verbose(`Adaptor on connect ${this.id}`.green)
     }
     registerRequest (providerObjBlueprint) {
-      if (this.isAuth) {
+      if (this.isAuth && this.isListening) {
         logger.verbose(
           `Add blueprint ${providerObjBlueprint.requestId} to Adaptor ${this.id} queue`.green
         )
@@ -67,7 +109,8 @@ const createAdaptor = ({ logger }) =>
         this.writeQueue()
       } else {
         logger.verbose(
-          `Cannot add ${providerObjBlueprint.requestId} to Adaptor ${this.id} queue (not auth)`.red
+          `Cannot add ${providerObjBlueprint
+            .requestId} to Adaptor ${this.id} queue (not auth or listening)`.red
         )
       }
     }
@@ -150,44 +193,54 @@ const createAdaptor = ({ logger }) =>
       this._socket.destroy()
       this.emit(Adaptor.ON_ADAPTOR_RECEPTION_ERROR, this.id)
     }
-    onCommunication (communication) {
-      const {
-        BRIDGE_TO_ADAPTOR_SUCCESS,
-        BRIDGE_TO_ADAPTOR_ERROR,
-        auth
-      } = communication
-      if (auth && !this.isAuth && this._config.isAuthRequired) {
-        if (this._config.authTokens.includes(auth.token)) {
-          this.isAuth = true
-          this.username = auth.username
-          this.token = auth.token
-          logger.verbose(`User: ${auth.username} is authenticated (${auth.token})`.green)
+    async onCommunication (communication) {
+      try {
+        const {
+          BRIDGE_TO_ADAPTOR_SUCCESS,
+          BRIDGE_TO_ADAPTOR_ERROR,
+          auth
+        } = communication
+        if (auth && !this.isAuth) {
+          const user = await adaptorInterface.auth(auth.token)
 
-          this.writeSocket(socketChunks.buildCommunication({ BRIDGE_ACCEPTED_AUTH }), () => {
-            this.emit(
-              Adaptor.ON_ADAPTOR_AUTH_SUCCESS, { socketId: this.id, username: auth.username })
-          })
-        } else {
-          this.writeSocket(socketChunks.buildCommunication({ BRIDGE_REFUSED_AUTH }), () => {
-            logger.verbose(`User: ${auth.username} authentication refused (${auth.token})`.red)
+          if (user) {
+            this.isAuth = true
+            this.userId = user.id
+            this.username = user.username
+            adaptorInterface.updateOnlineState(user.id, true)
 
-            if (this.authTimeout) {
-              clearTimeout(this.authTimeout)
-            }
-            this._socket.destroy()
-            this.emit(Adaptor.ON_ADAPTOR_AUTH_ERROR, { socketId: this.id, username: auth.username })
-          })
+            logger.verbose(`User: ${this.username} is authenticated (${auth.token})`.green)
+            this.writeSocket(
+              socketChunks.buildCommunication({ BRIDGE_ACCEPTED_AUTH, username: this.username }),
+              () => {
+                this.emit(
+                  Adaptor.ON_ADAPTOR_AUTH_SUCCESS, { socketId: this.id, username: this.username })
+              }
+            )
+          } else {
+            this.writeSocket(socketChunks.buildCommunication({ BRIDGE_REFUSED_AUTH }), () => {
+              logger.verbose(`User: ${auth.token} authentication refused`.red)
+
+              if (this.authTimeout) {
+                clearTimeout(this.authTimeout)
+              }
+              this._socket.destroy()
+              this.emit(Adaptor.ON_ADAPTOR_AUTH_ERROR, { socketId: this.id })
+            })
+          }
         }
-      }
-      if (BRIDGE_TO_ADAPTOR_SUCCESS) {
-        logger.verbose(`Receive ${BRIDGE_TO_ADAPTOR_SUCCESS} from ${this.id}`.yellow)
-      }
-      if (BRIDGE_TO_ADAPTOR_ERROR) {
-        logger.error(`Receive ${BRIDGE_TO_ADAPTOR_ERROR} from ${this.id}`.red)
-      }
-      if (BRIDGE_TO_ADAPTOR_SUCCESS || BRIDGE_TO_ADAPTOR_ERROR) {
-        this.ready = true
-        this.writeQueue()
+        if (BRIDGE_TO_ADAPTOR_SUCCESS) {
+          logger.verbose(`Receive ${BRIDGE_TO_ADAPTOR_SUCCESS} from ${this.id}`.yellow)
+        }
+        if (BRIDGE_TO_ADAPTOR_ERROR) {
+          logger.error(`Receive ${BRIDGE_TO_ADAPTOR_ERROR} from ${this.id}`.red)
+        }
+        if (BRIDGE_TO_ADAPTOR_SUCCESS || BRIDGE_TO_ADAPTOR_ERROR) {
+          this.ready = true
+          this.writeQueue()
+        }
+      } catch (e) {
+        console.log('e : ', e)
       }
     }
     onEnd () {
@@ -198,6 +251,17 @@ const createAdaptor = ({ logger }) =>
       if (this.authTimeout) {
         clearTimeout(this.authTimeout)
       }
+
+      adaptorInterface.emitter.removeListener(
+        ADAPTOR_UPDATE_LISTENING_STATE, this.adaptorInterfaceUpdateListeningState)
+      adaptorInterface.emitter.removeListener(
+        ADAPTOR_UPDATE_LISTENING_STATE, this.adaptorInterfaceUpdateBulkListeningState)
+      adaptorInterface.emitter.removeListener(
+        ADAPTOR_UPDATE_EXCLUSIVE_STATE, this.adaptorInterfaceUpdateExclusiveState)
+      adaptorInterface.emitter.removeListener(ADAPTOR_DELETE, this.adaptorDelete)
+      adaptorInterface.emitter.removeListener(ADAPTOR_UPDATE, this.adaptorUpdate)
+
+      adaptorInterface.updateOnlineState(this.userId, false)
       this.emit(Adaptor.ON_DISCONNECT, { socketId: this.id })
     }
     writeQueue () {
@@ -233,5 +297,6 @@ const createAdaptor = ({ logger }) =>
       }
     }
   }
+}
 
 module.exports = createAdaptor

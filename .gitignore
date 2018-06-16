@@ -7,3 +7,12 @@
 
 # NPM
 node_modules
+
+#lerna
+lerna-debug.log
+
+# hermes-backend
+packages/hermes-backend/data/db.json
+
+# hermes-dashboard
+packages/hermes-dashboard/build/*

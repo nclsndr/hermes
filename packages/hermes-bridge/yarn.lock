@@ -22,9 +22,17 @@ eyes@0.1.x:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/eyes/-/eyes-0.1.8.tgz#62cf120234c683785d902348a800ef3e0cc20bc0"
 
-hermes-utils@^0.0.7-0:
-  version "0.0.7-0"
-  resolved "https://registry.yarnpkg.com/hermes-utils/-/hermes-utils-0.0.7-0.tgz#83a7364e6f4d1d840edf9f45cdda46a377e9cbca"
+hermes-backend@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/hermes-backend/-/hermes-backend-0.0.7.tgz#d6a782a59ad6aac9d3f562296ce82fcbbb62df94"
+
+hermes-utils@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/hermes-utils/-/hermes-utils-0.0.7.tgz#f496e5caacf17fcf977ef5f689bdce5f80d32dea"
+  dependencies:
+    is-json "^2.0.1"
+    lodash "^4.17.5"
+    uuid "^3.2.1"
 
 is-json@^2.0.1:
   version "2.0.1"

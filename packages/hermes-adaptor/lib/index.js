@@ -40,11 +40,6 @@ function createChildProcess (config) {
       }
     }
   })
-  // cp.on('exit', code => {
-  //   setTimeout(() => {
-  //     createAdaptor(config, verbose)
-  //   }, 1000)
-  // })
   // cp.on('error', a => console.log('error : ', a))
   // cp.on('close', a => console.log('close : ', a))
   // cp.on('disconnect', a => console.log('disconnect : ', a))
@@ -60,8 +55,7 @@ function createAdaptor ({
   maxAttempts = 20,
   attemptDelay = 1000,
   verbose = false
-},
-) {
+}) {
   const config = {
     bridgeHost,
     bridgeSocketPort,

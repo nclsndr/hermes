@@ -8,10 +8,17 @@ createBridgeServer({
   httpPort: config.bridge.httpPort,
   socketPort: config.bridge.socketPort,
   loggerLevel: 'verbose',
-  clients: {
-    adaptors: {
-      isAuthRequired: true,
-      authTokens: config.adaptor.authTokens
+  // clients: { // TODO @Nico : prepare dashboardless version
+  //   adaptors: {
+  //     authTokens: config.adaptor.authTokens
+  //   }
+  // },
+  dashboard: {
+    port: config.backend.port,
+    adminAuth: {
+      username: 'admin',
+      password: 'admin',
+      jwtSecret: 'jiReKLKbTVA2qnjHun8ma2hgDcApuZ'
     }
   }
 })

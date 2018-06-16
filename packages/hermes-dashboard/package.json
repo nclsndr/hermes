@@ -2,7 +2,6 @@
   "name": "hermes-dashboard",
   "version": "0.0.7",
   "description": "Hermes dashboard front-end",
-  "main": "lib/index.js",
   "homepage": "https://github.com/chance-get-yours/hermes",
   "repository": {
     "type": "git",
@@ -20,5 +19,35 @@
   "engines": {
     "node": ">=8.10.0"
   },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "hermes-utils": "^0.0.7",
+    "history": "^4.7.2",
+    "moment": "^2.22.1",
+    "prop-types": "^15.6.1",
+    "react": "^16.3.1",
+    "react-dom": "^16.3.1",
+    "react-redux": "^5.0.7",
+    "react-router": "^4.2.0",
+    "react-router-dom": "^4.2.2",
+    "react-router-redux": "^5.0.0-alpha.6",
+    "react-scripts": "1.1.4",
+    "redux": "^3.7.2",
+    "redux-thunk": "^2.2.0",
+    "shortid": "^2.2.8",
+    "socket.io-client": "^2.1.1",
+    "styled-components": "^3.2.5"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "REACT_APP_STACK=production PUBLIC_URL=\/ react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "prepublish": "REACT_APP_STACK=production PUBLIC_URL=\/ react-scripts build"
+  },
+  "files": [
+    "build"
+  ],
+  "main": "fileSystem.js",
   "license": "MIT"
 }

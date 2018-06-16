@@ -30,9 +30,13 @@ Hermes allows **concurrent calls among clients**. By default, the first response
 
 ## Usage
 
+### Requirements
+
+- Node >= 8.10.0
+
 ---
 ### 🌍 Bridge: Server side
-You need to procure any kind of server able to 1. run node 8+, 2. allow specific port access (different from 80 and 443) 
+You need to procure any kind of server able to: 1. run node 8+, 2. allow specific port access (different from 80 and 443) 
 
 > All the information provided here are gathered into this [example directory](https://github.com/chance-get-yours/hermes/tree/master/examples/basic-bridge)
 
@@ -65,13 +69,15 @@ const responseFallback = {
 }
 
 createBridgeServer({
-  httpPort: 8000, // make sure you can acess from outside of your machine
+  httpPort: 8000, // make sure you can access from outside of your machine
   socketPort: 9000, // this port will be reused for the adaptor configuration
   loggerLevel: 'verbose', // 'info'
-  clients: {
-    adaptors: {
-      isAuthRequired: true, // enable/disable authentication check
-      authTokens: tokens // [stringToken]
+  dashboard: { // for you to control your adaptors in real time
+    port: 8001, // port to access the dashboard
+    adminAuth: { // credentials to connect onto the dashboard
+      username: 'admin',
+      password: 'admin', // should be placed into .env
+      jwtSecret: 'jiReKLKbTVA2qnjHun8ma2hgDcApuZ' // should be placed into .env also!
     }
   },
   defaultResponse: responseFallback // by default, hermes provide the fallback described above
@@ -88,10 +94,23 @@ $ node index.js
 **Notes**
 
 - For a basic DNS resolution you can use our [NGINX configuration file](https://github.com/chance-get-yours/hermes/blob/master/examples/basic-bridge/nginx.conf)
+- To run node as a daemon we recommend using [forever](https://github.com/foreverjs/forever) or [PM2](http://pm2.keymetrics.io/)
 - Some providers require to use HTTPS, we recommend to use [Let's Encrypt](https://letsencrypt.org/) with [Cerbot](https://certbot.eff.org/)
 - DNS resolution for the socket endpoint is possible but not as easy as it seems. We recommend to use the IP for configuring the adaptor.
 - [Heroku](https://www.heroku.com/) users, as far as the service doesn't allow multi-port exposure, hermes-bridge will not be compatible.
 
+#### 5. 🖥 Dashboard first setup
+
+Navigate to the URL (or IP:port) you set up for your Hermes *dashboard*. You should have something like:
+
+![](https://github.com/chance-get-yours/hermes/blob/master/docs/assets/dashboard-login.png?raw=true)
+
+Then login with your admin credentials *(the ones you choose into the bridge config file)*
+![](https://github.com/chance-get-yours/hermes/blob/master/docs/assets/dashboard-new-adaptor.png?raw=true)
+
+You can now add a new *adaptor* with the auth token of your choice — you will reuse it soon — the best is an alphanumeric string without spaces.
+
+**🎉 Server side is done: congrats! 🎉**
 
 ---
 ### 🛌 Adaptor: Local dev env
@@ -122,8 +141,7 @@ adaptor.init({
   maxAttempts: 10, // number of attempts to reconnect in case of network errors
   attemptDelay: 200,
   auth: {
-    token: 'gHmFyUkCSpGRXiWFxvLMpGYbMXvcsi', // This token has to be listed into the Bridge configurartion
-    username: 'Nico' // Up to you
+    token: 'gHmFyUkCSpGRXiWFxvLMpGYbMXvcsi', // Put here the token you choose in the dashboard
   },
   verbose: true // logger output level
 })
@@ -142,13 +160,19 @@ You need to launch your local server too if you want the all system to do his jo
 - We recommend to use [concurrently](https://www.npmjs.com/package/concurrently) in order to start your dev-server in parallel with the adaptor
 - For setup testing, you can try a `curl http://my-bridge.com`, then you should receive the request on your adaptor console (verbose = true).
 
-### Hermes in action
+Here you should have something like:
+
+![](https://github.com/chance-get-yours/hermes/blob/master/docs/assets/adaptor-on-auth.png?raw=true=200x)
+
+---
+
+### 🖥 Dashboard features
+
+[TO DO]
+
+#### Hermes in action
 
 ![](https://github.com/chance-get-yours/hermes/blob/master/docs/assets/cli-demo.gif?raw=true)
-
-### Requirements
-
-- Node >= 8.10.0
 
 ## Why not use [ngrok](https://ngrok.com/)?
 
@@ -168,10 +192,11 @@ Here a small features comparison to help you choose.
 | Custom sub-domain | ✅ | ✅ |
 | Custom domain | ❌ | ✅ |
 | Command Line Interface | ✅ | ❌ (not priority) |
-| Authentication | ✅ | ⏳ (Plan for 1.0) |
-| Web based real time dashboard | ❌ | ⏳ (Plan for 1.0) |
+| Authentication | ✅ | ✅ |
+| Web based real time dashboard | ❌ | ✅ |
 | Concurrent clients | ❌ | ✅ |
-| Concurrency management | ❌ | ⏳ (Plan for 2.0) |
+| Concurrency management among clients | ❌ | ✅ |
+| Concurrency management (clients + servers) | ❌ | ⏳ (Plan for 2.0) |
 | Server to server management | ❌ | ⏳ (Plan for 2.0) |
 | Retry strategy for failed requests | ❌ | ⏳ (Plan for 2.0) |
 | Request replay | ✅ | ⏳ (Plan for 3.0) |
@@ -189,21 +214,25 @@ Here a small features comparison to help you choose.
 - We use the same eslint configuration for all the repository, it is opinionated, but we are good with that.
  
 ## Roadmap
-### V1 Release
 #### Adaptor
-- [ ] *Adaptor* is able to restart on error
-- [ ] *Adaptor* send fixed token to *bridge*
-- [ ] *Adaptor* warn all users that a new *adaptor* connects
+- [x] *Adaptor* is able to restart on error
+- [x] *Adaptor* send fixed token to *bridge*
+- [x] *Adaptor* warn all users that a new *adaptor* connects
 
 #### Bridge
-- [ ] *Bridge* validates the *adaptor* token
-- [ ] *Bridge* prevents any *adaptor* that do not provide an auth token to receive data
+- [x] *Bridge* validates the *adaptor* token
+- [x] *Bridge* prevents any *adaptor* that do not provide an auth token to receive data
+
+#### Dashboard
+- [x] *Dashboard* provides auth
+- [x] *Dashboard* provides *adaptor* management in real time
+- [ ] *Dashboard* provides console debug in real time
 
 #### Test-env
 - [ ] Provide an integration test suite
 
 #### Test-env - Provider
-- [ ] Provide multiple types of requests (string, JSON, files, buffer, methods...)
+- [x] Provide multiple types of requests (string, JSON, files, buffer, methods...)
 
 ## License
 

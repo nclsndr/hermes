@@ -179,10 +179,6 @@ hawk@~6.0.2:
     hoek "4.x.x"
     sntp "2.x.x"
 
-hermes-utils@^0.0.7-0:
-  version "0.0.7-0"
-  resolved "https://registry.yarnpkg.com/hermes-utils/-/hermes-utils-0.0.7-0.tgz#83a7364e6f4d1d840edf9f45cdda46a377e9cbca"
-
 hoek@4.x.x:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/hoek/-/hoek-4.2.1.tgz#9634502aa12c445dd5a7c5734b572bb8738aacbb"

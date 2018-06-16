@@ -4,15 +4,35 @@
 const { blueprints: { createProviderBlueprint } } = require('hermes-utils')
 
 const createAdaptor = require('./Adaptor')
-const clientsConfigFormatter = require('./utils/clientsConfigFormatter')
+const backendManager = require('./backendManager')
+const createConfigManager = require('./configManager')
 
-const createClientsManager = ({ logger }) => {
-  const Adaptor = createAdaptor({ logger })
+const createClientsManager = ({ logger, clients, dashboard }) => {
+  let backend = null
+  if (dashboard) {
+    backend = backendManager(dashboard)
+  }
+  let configManager = null
+  if (clients) {
+    configManager = createConfigManager(clients)
+  }
+  const hasDashboard = !!backend
+  const adaptorInterface = {
+    hasDashboard,
+    auth: token => (hasDashboard
+      ? backend.getAdaptorByAuthToken(token)
+      : configManager.adaptorAuth(token)),
+    updateOnlineState: (id, isOnline) => (hasDashboard
+      ? backend.adaptorUpdateOnlineState(id, isOnline)
+      : () => {}),
+    emitter: hasDashboard ? backend.emitter : configManager.emitter
+  }
+
+  const Adaptor = createAdaptor({ logger, adaptorInterface })
 
   return class ClientsManager {
-    constructor (clients, defaultResponse) {
+    constructor (defaultResponse) {
       this._defaultResponse = defaultResponse
-      this.clientsConfig = clientsConfigFormatter(clients)
       this.adaptors = new Map()
       this.pendingResponses = new Map()
     }
@@ -35,7 +55,7 @@ const createClientsManager = ({ logger }) => {
 
         const hasReadyAdaptor = Array // prevent onAuth adaptors to be considered
           .from(this.adaptors.values())
-          .reduce((acc, c) => acc || c.isAuth, false)
+          .reduce((acc, c) => acc || (c.isAuth && c.isListening), false)
 
         if (this.adaptors.size > 0 && hasReadyAdaptor) {
           this.pendingResponses.set(providerBlueprint.requestId, res)
@@ -52,10 +72,7 @@ const createClientsManager = ({ logger }) => {
       })
     }
     addAdaptor (nodeSocket) {
-      const adaptor = new Adaptor(
-        nodeSocket,
-        { ...this.clientsConfig.adaptors }
-      )
+      const adaptor = new Adaptor(nodeSocket)
       adaptor.on(Adaptor.ON_DISCONNECT, ({ socketId }) => {
         const beforeDelete = this.adaptors.get(socketId)
         const username = `${beforeDelete.username}`

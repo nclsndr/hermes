@@ -3,10 +3,10 @@
 --------------------------------------------- */
 const http = require('http')
 const net = require('net')
+const isEmpty = require('lodash/isEmpty')
 
 const createClientsManager = require('./ClientsManager')
 const createLogger = require('./utils/logger')
-// TODO @Nico : manage http / https
 
 const responseFallback = {
   statusCode: 500,
@@ -20,25 +20,33 @@ const createBridgeServer = ({
   httpPort,
   socketPort,
   loggerLevel = 'verbose',
-  clients = {},
+  clients,
+  dashboard,
   defaultResponse = responseFallback
 }) => {
   const logger = createLogger(loggerLevel)
 
-  const ClientsManager = createClientsManager({ logger })
-  const manager = new ClientsManager(clients, defaultResponse)
+  if (!isEmpty(clients) && !isEmpty(dashboard)) {
+    logger.line('info', 'red')
+    logger.error('Config cannot contain both "clients" and "dashboard" keys')
+    logger.line('info', 'red')
+    process.exit(1)
+  }
+
+  const ClientsManager = createClientsManager({ logger, clients, dashboard })
+  const manager = new ClientsManager(defaultResponse)
 
   const httpServer = http.createServer(manager.createProviderRequestHandler.bind(manager))
   httpServer.listen(httpPort, () => {
     logger.line('verbose', 'cyan')
-    logger.verbose(`HTTP server running on ${httpPort}`.cyan)
+    logger.verbose(`Bridge HTTP server running on ${httpPort}`.cyan)
     logger.line('verbose', 'cyan')
   })
 
   const socketServer = net.createServer(manager.addAdaptor.bind(manager))
   socketServer.listen(socketPort, () => {
     logger.line('verbose', 'cyan')
-    logger.verbose(`Socket server running on ${socketPort}`.cyan)
+    logger.verbose(`Bridge Socket server running on ${socketPort}`.cyan)
     logger.line('verbose', 'cyan')
   })
 }

@@ -1,6 +1,6 @@
 {
   "name": "hermes-utils",
-  "version": "0.0.7",
+  "version": "1.0.0",
   "description": "Hermes packages shared resources and utils",
   "main": "lib/index.js",
   "homepage": "https://github.com/chance-get-yours/hermes",

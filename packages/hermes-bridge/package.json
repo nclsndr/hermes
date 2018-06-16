@@ -1,6 +1,6 @@
 {
   "name": "hermes-bridge",
-  "version": "0.0.10",
+  "version": "1.0.0",
   "description": "Link between the provider and the Hermes Adaptor",
   "main": "lib/index.js",
   "homepage": "https://github.com/chance-get-yours/hermes",
@@ -23,8 +23,8 @@
   "license": "MIT",
   "dependencies": {
     "colors": "^1.1.2",
-    "hermes-backend": "^0.0.7",
-    "hermes-utils": "^0.0.7",
+    "hermes-backend": "^1.0.0",
+    "hermes-utils": "^1.0.0",
     "is-json": "^2.0.1",
     "lodash": "^4.17.5",
     "uuid": "^3.2.1",

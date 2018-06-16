@@ -1,6 +1,6 @@
 {
   "name": "hermes-dashboard",
-  "version": "0.0.7",
+  "version": "1.0.0",
   "description": "Hermes dashboard front-end",
   "homepage": "https://github.com/chance-get-yours/hermes",
   "repository": {
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "hermes-utils": "^0.0.7",
+    "hermes-utils": "^1.0.0",
     "history": "^4.7.2",
     "moment": "^2.22.1",
     "prop-types": "^15.6.1",
@@ -40,10 +40,10 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "REACT_APP_STACK=production PUBLIC_URL=\/ react-scripts build",
+    "build": "REACT_APP_STACK=production PUBLIC_URL=/ react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "prepublish": "REACT_APP_STACK=production PUBLIC_URL=\/ react-scripts build"
+    "prepublish": "REACT_APP_STACK=production PUBLIC_URL=/ react-scripts build"
   },
   "files": [
     "build"

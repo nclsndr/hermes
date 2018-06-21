@@ -17,26 +17,26 @@ Then Hermes comes and provides two modules:
 
 When the response is emitted from the *local server*, it brings the response back to the *provider* following the same logic.
 
-![](https://github.com/chance-get-yours/hermes/blob/master/docs/assets/concept.jpg?raw=true)
+![](https://github.com/nclsndr/hermes/blob/master/docs/assets/concept.jpg?raw=true)
 
 ## Execution modes
 ### 1 to 1 communication
 
 This is the most basic case. It applies for a single developer working on his machine receiving a request from a *provider*
 
-![](https://github.com/chance-get-yours/hermes/blob/master/docs/assets/basic.jpg?raw=true)
+![](https://github.com/nclsndr/hermes/blob/master/docs/assets/basic.jpg?raw=true)
 
 ### Concurrency
 
 Concurrency mode allows **concurrent calls among clients** (aka Adaptors). By default, the first response received from any client (*adaptor*) will be used as the final response for the *provider*. This feature is particularly useful for teams of developers working in parallel when the provider do not require a client-specific response.
 
-![](https://github.com/chance-get-yours/hermes/blob/master/docs/assets/concurrent.jpg?raw=true)
+![](https://github.com/nclsndr/hermes/blob/master/docs/assets/concurrent.jpg?raw=true)
 
 #### Exclusive
 
 Exclusive mode permits to temporally **choose a single adaptor** as responsible for building the response sent to the *provider*.
 
-![](https://github.com/chance-get-yours/hermes/blob/master/docs/assets/exclusive.jpg?raw=true)
+![](https://github.com/nclsndr/hermes/blob/master/docs/assets/exclusive.jpg?raw=true)
 
 ## Setup
 
@@ -49,7 +49,7 @@ Exclusive mode permits to temporally **choose a single adaptor** as responsible 
 
 You need to procure any kind of server able to allow specific port access (different from 80 and 443) — you'll need 3 ports.
 
-> All the code snippets provided below are gathered into this [example directory](https://github.com/chance-get-yours/hermes/tree/master/examples/basic-bridge)
+> All the code snippets provided below are gathered into this [example directory](https://github.com/nclsndr/hermes/tree/master/examples/basic-bridge)
 
 #### 1. Create a new project
 
@@ -104,7 +104,7 @@ $ node index.js
 
 **Notes**
 
-- For a basic DNS resolution you can use our [NGINX configuration file](https://github.com/chance-get-yours/hermes/blob/master/examples/basic-bridge/nginx.conf)
+- For a basic DNS resolution you can use our [NGINX configuration file](https://github.com/nclsndr/hermes/blob/master/examples/basic-bridge/nginx.conf)
 - To run node as a daemon we recommend the use of [forever](https://github.com/foreverjs/forever) or [PM2](http://pm2.keymetrics.io/)
 - Some providers require to use HTTPS, we recommend to use [Let's Encrypt](https://letsencrypt.org/) with [Cerbot](https://certbot.eff.org/)
 - DNS resolution for the socket endpoint is possible but not as easy as it seems. We recommend to use the IP for configuring the adaptor.
@@ -114,10 +114,10 @@ $ node index.js
 
 Navigate to the URL (or IP:port) you set up for your Hermes *dashboard*. You should have something like:
 
-![](https://github.com/chance-get-yours/hermes/blob/master/docs/assets/dashboard-login.png?raw=true)
+![](https://github.com/nclsndr/hermes/blob/master/docs/assets/dashboard-login.png?raw=true)
 
 Then login with your admin credentials *(the ones you choose into the bridge config file)*
-![](https://github.com/chance-get-yours/hermes/blob/master/docs/assets/dashboard-new-adaptor.png?raw=true)
+![](https://github.com/nclsndr/hermes/blob/master/docs/assets/dashboard-new-adaptor.png?raw=true)
 
 You can now add a new *adaptor* with the auth token of your choice — you will reuse it soon — the best is an alphanumeric string without spaces.
 
@@ -128,7 +128,7 @@ You can now add a new *adaptor* with the auth token of your choice — you will 
 ### 🛌 Adaptor: Local dev env
 The adaptor can be set in any dev environment that support NodeJS 8+.
 
-> All the information provided here are gathered into this [example directory](https://github.com/chance-get-yours/hermes/tree/master/examples/basic-adaptor)
+> All the information provided here are gathered into this [example directory](https://github.com/nclsndr/hermes/tree/master/examples/basic-adaptor)
 
 #### 1. Install hermes-adaptor
 
@@ -174,7 +174,7 @@ You need to launch your local server too if you want the all system to do his jo
 
 Here you should have something like:
 
-![](https://github.com/chance-get-yours/hermes/blob/master/docs/assets/adaptor-on-auth.png?raw=true=200x)
+![](https://github.com/nclsndr/hermes/blob/master/docs/assets/adaptor-on-auth.png?raw=true=200x)
 
 **🎉 Nice! you can now start using Hermes for your development 🎉**
 
@@ -184,7 +184,7 @@ Here you should have something like:
 
 ### Adaptor listening modes
 
-![](https://github.com/chance-get-yours/hermes/blob/master/docs/assets/adpators-modes.jpg?raw=true)
+![](https://github.com/nclsndr/hermes/blob/master/docs/assets/adpators-modes.jpg?raw=true)
 
 **Concurrency:** All the online adaptors receive the requests — *the first adaptor that respond back will be transmit to the provider*
 
@@ -195,7 +195,7 @@ Here you should have something like:
 ## 🔭  Preview
 ### Provider > Bridge > Adaptor > Local server > Adaptor > Bridge > Provider
 
-![](https://github.com/chance-get-yours/hermes/blob/master/docs/assets/cli-demo.gif?raw=true)
+![](https://github.com/nclsndr/hermes/blob/master/docs/assets/cli-demo.gif?raw=true)
 
 ## Why not use [ngrok](https://ngrok.com/)?
 
@@ -266,4 +266,4 @@ Here a small features comparison to help you choose which tool suits you best.
 
 ## License
 
-This project is distributed under the [MIT License](https://github.com/chance-get-yours/hermes/blob/master/LICENSE).
+This project is distributed under the [MIT License](https://github.com/nclsndr/hermes/blob/master/LICENSE).

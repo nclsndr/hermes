@@ -4,6 +4,13 @@
 const dotEnv = require('dotenv').config() // /!\ think about renaming the dot.env as .env
 const createBridgeServer = require('hermes-bridge')
 
+if (dotEnv.error) { // ensure .env file exists
+  console.log('========================')
+  console.error('No .env file detected')
+  console.log('========================')
+  process.exit(1)
+}
+
 // Response used when no adaptors are connected (some providers like Facebook, accept 2xx status code only)
 const responseFallback = {
   statusCode: 500,

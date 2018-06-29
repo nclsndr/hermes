@@ -69,6 +69,10 @@ const backendManager = config => {
     }
   })
 
+  process.on('exit', () => {
+    backendCP.kill()
+  })
+
   return {
     getAdaptorByAuthToken: token => new Promise((resolve, reject) => {
       const rId = uuid()

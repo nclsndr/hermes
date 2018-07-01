@@ -19,10 +19,12 @@ const responseFallback = {
 }
 
 createBridgeServer({
-  httpPort: 8000, // make sure you can access from outside of your machine
+  httpHost: 'localhost', // default '127.0.0.1' (set to 0.0.0.0 to access from the outside by default)
+  httpPort: 8000, // port on which the Bridge will listen
+  socketHost: 'localhost', // default httpHost || '127.0.0.1' (set to 0.0.0.0 to access from the outside by default)
   socketPort: 9000, // this port will be reused for the adaptor configuration
-  loggerLevel: 'verbose', // 'info'
   dashboard: { // for you to control your adaptors in real time
+    host: 'localhost', // default '127.0.0.1' (set to 0.0.0.0 to access from the outside by default)
     port: 8001, // port to access the dashboard
     adminAuth: { // credentials to connect onto the dashboard
       username: 'admin',
@@ -30,5 +32,6 @@ createBridgeServer({
       jwtSecret: dotEnv.parsed.ADMIN_AUTH_JWT_SECRET // Change it also into your .env file!
     }
   },
+  loggerLevel: 'verbose', // 'info'
   defaultResponse: responseFallback // by default, hermes provide the fallback described above
 })

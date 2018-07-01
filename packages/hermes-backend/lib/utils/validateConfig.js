@@ -17,6 +17,7 @@ const validateConfig = config => {
   }
   return {
     ...config,
+    host: config.host || '127.0.0.1',
     port: config.port || 3000
   }
 }

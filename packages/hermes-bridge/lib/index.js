@@ -17,7 +17,9 @@ const responseFallback = {
 }
 
 const createBridgeServer = ({
+  httpHost,
   httpPort,
+  socketHost,
   socketPort,
   loggerLevel = 'verbose',
   clients,
@@ -37,18 +39,31 @@ const createBridgeServer = ({
   const manager = new ClientsManager(defaultResponse)
 
   const httpServer = http.createServer(manager.createProviderRequestHandler.bind(manager))
-  httpServer.listen(httpPort, () => {
-    logger.line('verbose', 'cyan')
-    logger.verbose(`Bridge HTTP server running on ${httpPort}`.cyan)
-    logger.line('verbose', 'cyan')
-  })
+  httpServer.listen(
+    {
+      host: httpHost || '127.0.0.1',
+      port: httpPort
+    },
+    () => {
+      logger.line('verbose', 'cyan')
+      logger.verbose(`  Bridge HTTP server running on ${httpHost || '127.0.0.1'}:${httpPort}`.cyan)
+      logger.line('verbose', 'cyan')
+    }
+  )
 
   const socketServer = net.createServer(manager.addAdaptor.bind(manager))
-  socketServer.listen(socketPort, () => {
-    logger.line('verbose', 'cyan')
-    logger.verbose(`Bridge Socket server running on ${socketPort}`.cyan)
-    logger.line('verbose', 'cyan')
-  })
+  socketServer.listen(
+    {
+      host: socketHost || httpHost || '127.0.0.1',
+      port: socketPort
+    },
+    () => {
+      logger.line('verbose', 'cyan')
+      logger.verbose(
+        `  Bridge Socket server running on ${httpHost || '127.0.0.1'}:${socketPort}`.cyan)
+      logger.line('verbose', 'cyan')
+    }
+  )
 }
 
 module.exports = createBridgeServer

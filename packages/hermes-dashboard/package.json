@@ -1,6 +1,6 @@
 {
   "name": "hermes-dashboard",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Hermes dashboard front-end",
   "homepage": "https://github.com/nclsndr/hermes",
   "repository": {
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "hermes-utils": "^1.0.0",
+    "hermes-utils": "^1.0.1",
     "history": "^4.7.2",
     "moment": "^2.22.1",
     "prop-types": "^15.6.1",

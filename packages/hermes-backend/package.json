@@ -1,6 +1,6 @@
 {
   "name": "hermes-backend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Provide the logic for running Hermes dashboard",
   "main": "lib/index.js",
   "homepage": "https://github.com/nclsndr/hermes",
@@ -26,8 +26,8 @@
     "colors": "^1.2.1",
     "cors": "^2.8.4",
     "express": "^4.16.3",
-    "hermes-dashboard": "^1.0.0",
-    "hermes-utils": "^1.0.0",
+    "hermes-dashboard": "^1.0.1",
+    "hermes-utils": "^1.0.1",
     "jsonwebtoken": "^8.2.1",
     "lodash": "^4.17.5",
     "lowdb": "^1.0.0",

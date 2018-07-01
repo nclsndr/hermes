@@ -142,6 +142,9 @@ const createClientsManager = ({ logger, clients, dashboard }) => {
       adaptor.on(Adaptor.ON_ADAPTOR_AUTH_ERROR, ({ socketId }) => {
         this.adaptors.delete(socketId)
       })
+      adaptor.on(Adaptor.ON_PARSE_ERROR, socketId => {
+        this.adaptors.delete(socketId)
+      })
 
       this.adaptors.set(adaptor.id, adaptor)
     }

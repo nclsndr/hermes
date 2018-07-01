@@ -48,30 +48,42 @@ if (process.argv[2]) {
     const { id, type, payload } = args
     switch (type) {
       case CP_ADAPTOR_GET_BY_AUTH_TOKEN.REQUEST: {
-        const client = db.getAdaptorByAuthToken(payload)
-        if (client) {
-          process.send({ id, type: CP_ADAPTOR_GET_BY_AUTH_TOKEN.SUCCESS, payload: client })
-        } else {
-          process.send({ id, type: CP_ADAPTOR_GET_BY_AUTH_TOKEN.FAILURE, payload: null })
+        try {
+          const client = db.getAdaptorByAuthToken(payload)
+          if (client) {
+            process.send({ id, type: CP_ADAPTOR_GET_BY_AUTH_TOKEN.SUCCESS, payload: client })
+          } else {
+            process.send({ id, type: CP_ADAPTOR_GET_BY_AUTH_TOKEN.FAILURE, payload: null })
+          }
+        } catch (e) {
+          process.send({ id, type: CP_ADAPTOR_GET_BY_AUTH_TOKEN.FAILURE, payload: e.message })
         }
         break
       }
       case CP_ADAPTOR_UPDATE_ONLINE_STATE.REQUEST: {
-        const adaptor = db.updateAdaptorOnlineState(payload.id, payload.isOnline)
-        emitter.emit(ADAPTOR_UPDATE_ONLINE_STATE, adaptor)
-        if (adaptor) {
-          process.send({ id, type: CP_ADAPTOR_UPDATE_ONLINE_STATE.SUCCESS, payload: adaptor })
-        } else {
-          process.send({ id, type: CP_ADAPTOR_UPDATE_ONLINE_STATE.FAILURE, payload: null })
+        try {
+          const adaptor = db.updateAdaptorOnlineState(payload.id, payload.isOnline)
+          emitter.emit(ADAPTOR_UPDATE_ONLINE_STATE, adaptor)
+          if (adaptor) {
+            process.send({ id, type: CP_ADAPTOR_UPDATE_ONLINE_STATE.SUCCESS, payload: adaptor })
+          } else {
+            process.send({ id, type: CP_ADAPTOR_UPDATE_ONLINE_STATE.FAILURE, payload: null })
+          }
+        } catch (e) {
+          process.send({ id, type: CP_ADAPTOR_UPDATE_ONLINE_STATE.FAILURE, payload: e.message })
         }
         break
       }
       case CP_BACKEND_GET_SETTINGS.REQUEST: {
-        const settings = db.getSettings()
-        if (settings) {
-          process.send({ id, type: CP_BACKEND_GET_SETTINGS.SUCCESS, payload: settings })
-        } else {
-          process.send({ id, type: CP_BACKEND_GET_SETTINGS.FAILURE, payload: null })
+        try {
+          const settings = db.getSettings()
+          if (settings) {
+            process.send({ id, type: CP_BACKEND_GET_SETTINGS.SUCCESS, payload: settings })
+          } else {
+            process.send({ id, type: CP_BACKEND_GET_SETTINGS.FAILURE, payload: null })
+          }
+        } catch (e) {
+          process.send({ id, type: CP_BACKEND_GET_SETTINGS.FAILURE, payload: e.message })
         }
         break
       }

@@ -37,8 +37,10 @@ describe('SocketChunks util', () => {
         isEndOfRequest,
         requestLength,
         requestContent,
-        communication
+        communication,
+        error
       } = parse(`${communicationInput}${request}`)
+      expect(error).toBe(false)
       expect(isStartOfRequest).toBe(true)
       expect(isEndOfRequest).toBe(true)
       expect(requestLength).toBe('request content'.length)
@@ -147,6 +149,22 @@ describe('SocketChunks util', () => {
       expect(requestLength).toBe(null)
       expect(requestContent).toBe('I am a random central \n chunk')
       expect(communication).toEqual(expect.objectContaining({}))
+    })
+    test('Parse non-regular line break', () => {
+      const content = 'one\ntwo\r\nthree\rfour'
+      const request = buildRequest(content)
+      const {
+        isStartOfRequest,
+        isEndOfRequest,
+        requestLength,
+        requestContent,
+        error
+      } = parse(request)
+      expect(error).toBe(false)
+      expect(isStartOfRequest).toBe(true)
+      expect(isEndOfRequest).toBe(true)
+      expect(requestLength).toBe(content.length)
+      expect(requestContent).toBe(content)
     })
   })
 })

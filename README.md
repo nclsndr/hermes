@@ -110,11 +110,12 @@ $ node index.js
 
 **Notes**
 
-- For a basic DNS resolution you can use our [NGINX configuration file](https://github.com/nclsndr/hermes/blob/master/examples/basic-bridge/nginx.conf)
-- To run node as a daemon we recommend the use of [forever](https://github.com/foreverjs/forever) or [PM2](http://pm2.keymetrics.io/)
+- For a basic DNS resolution you can use our [NGINX configuration file](https://github.com/nclsndr/hermes/blob/master/examples/basic-bridge/classic.nginx)
 - Some providers require to use HTTPS, we recommend to use [Let's Encrypt](https://letsencrypt.org/) with [Cerbot](https://certbot.eff.org/)
-- DNS resolution for the socket endpoint is possible but not as easy as it seems. We recommend to use the IP for configuring the adaptor.
-- [Heroku](https://www.heroku.com/) users, as far as the service doesn't allow multi-port exposure, hermes-bridge will not be compatible.
+- For SSL usage, you can use our [SSL NGINX configuration file](https://github.com/nclsndr/hermes/blob/master/examples/basic-bridge/ssl.nginx) — this example supposed you use letsencrypt & certbot
+- DNS resolution for the socket endpoint is possible but not as easy as it seems. We recommend to use the IP for configuring the adaptor. *BTW Contribution is more than welcome if you think it's an essential feature* 🤗
+- To run node as a daemon we recommend the use of [forever](https://github.com/foreverjs/forever) or [PM2](http://pm2.keymetrics.io/)
+- Unfortunately for [Heroku](https://www.heroku.com/) users, as far as the service doesn't allow multi-port exposure, hermes-bridge will not be compatible.
 
 #### 5. Dashboard: register your Adaptor(s)
 
@@ -151,7 +152,7 @@ Create a `hermes.js` file.
 const adaptor = require('hermes-adaptor')
 
 adaptor.init({
-  bridgeHost: 'YOUR_SERVER_IP', // if set to 0.0.0.0 in the Bridge config
+  bridgeHost: 'YOUR_SERVER_IP',
   bridgeSocketPort: 9000, // the port you chose previously
   localServerProtocol: 'http',
   localServerHost: 'localhost',
@@ -199,6 +200,8 @@ Here you should have something like:
 **Exclusive:** Only one adaptor is receiving the requests — *this feature is particularly adapted for testing a specific response toward the provider*
 
 ## 🔭  Preview
+### Single adaptor
+![](https://github.com/nclsndr/hermes/blob/master/docs/assets/single-adaptor-preview.gif?raw=true)
 ### Provider > Bridge > Adaptor > Local server > Adaptor > Bridge > Provider
 
 ![](https://github.com/nclsndr/hermes/blob/master/docs/assets/cli-demo.gif?raw=true)

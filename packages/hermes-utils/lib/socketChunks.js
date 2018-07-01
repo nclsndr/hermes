@@ -19,11 +19,15 @@ const SEPARATORS = {
 const parse = chunk => {
   const { c, cs, cm, ce } = SEPARATORS
   const chunkMatch = new RegExp(
-    `^(?:${c}(.*?)${c})?(?:${cs}(\\d*)${cm})?((?:.|\\n)*?)(${ce})?(?:${c}(.*?)${c})?$`,
+    `^(?:${c}(.*?)${c})?(?:${cs}(\\d*)${cm})?((?:.|\\n|\\r\\n|\\r)*?)(${ce})?(?:${c}(.*?)${c})?$`,
     'g'
   )
   const res = chunkMatch.exec(chunk)
+  if (!res) {
+    return { error: true }
+  }
   return {
+    error: false,
     isStartOfRequest: !!res[2],
     isEndOfRequest: !!res[4],
     requestLength: res[2] ? Number(res[2]) : null,

@@ -37,12 +37,15 @@ const createAdaptor = ({ logger, adaptorInterface }) => {
     static get ON_DISCONNECT () {
       return 'ON_DISCONNECT'
     }
+    static get ON_PARSE_ERROR () {
+      return 'ON_PARSE_ERROR'
+    }
     constructor (socket) {
       super()
       this.id = uuid()
       this._socket = socket
       this._socket.on('data', this.onData.bind(this))
-      this._socket.on('end', this.onEnd.bind(this))
+      this._socket.on('end', this.onDisconnect.bind(this))
       this.isAuth = false
       this.isListening = false
       this.userId = null
@@ -118,14 +121,22 @@ const createAdaptor = ({ logger, adaptorInterface }) => {
       this.writeSocket(socketChunks.buildCommunication(obj))
     }
     onData (buffer) {
-      const parsed = buffer.toString()
+      const str = buffer.toString()
       const {
         isStartOfRequest,
         isEndOfRequest,
         requestLength,
         requestContent,
-        communication
-      } = socketChunks.parse(parsed)
+        communication,
+        error
+      } = socketChunks.parse(str)
+
+      if (error) return this.onParseError()
+      // the socket is not sent by an Adaptor
+      if (requestContent && !this.isAuth && Object.keys(communication).length === 0) {
+        return this.onParseError()
+      }
+
       // Internal communication
       if (Object.keys(communication).length > 0) {
         this.onCommunication(communication)
@@ -193,6 +204,14 @@ const createAdaptor = ({ logger, adaptorInterface }) => {
       this._socket.destroy()
       this.emit(Adaptor.ON_ADAPTOR_RECEPTION_ERROR, this.id)
     }
+    onParseError () {
+      logger.warn(`Adaptor parsing error ${this.id}`.red)
+      if (this.authTimeout) {
+        clearTimeout(this.authTimeout)
+      }
+      this._socket.destroy()
+      this.emit(Adaptor.ON_PARSE_ERROR, this.id)
+    }
     async onCommunication (communication) {
       try {
         const {
@@ -243,10 +262,10 @@ const createAdaptor = ({ logger, adaptorInterface }) => {
         console.log('e : ', e)
       }
     }
-    onEnd () {
+    async onDisconnect () {
       this.ready = false
       this.pendingRequests = []
-      logger.verbose(`Adaptor on disconnect ${this.id}`.yellow)
+      logger.verbose(`User ${this.username} disconnects (${this.id})`.yellow)
 
       if (this.authTimeout) {
         clearTimeout(this.authTimeout)
@@ -261,7 +280,12 @@ const createAdaptor = ({ logger, adaptorInterface }) => {
       adaptorInterface.emitter.removeListener(ADAPTOR_DELETE, this.adaptorDelete)
       adaptorInterface.emitter.removeListener(ADAPTOR_UPDATE, this.adaptorUpdate)
 
-      adaptorInterface.updateOnlineState(this.userId, false)
+      try {
+        await adaptorInterface.updateOnlineState(this.userId, false)
+      } catch (e) {
+        logger.error(`${e.message}`.red)
+      }
+
       this.emit(Adaptor.ON_DISCONNECT, { socketId: this.id })
     }
     writeQueue () {

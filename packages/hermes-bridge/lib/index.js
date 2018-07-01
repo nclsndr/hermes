@@ -60,7 +60,7 @@ const createBridgeServer = ({
     () => {
       logger.line('verbose', 'cyan')
       logger.verbose(
-        `  Bridge Socket server running on ${httpHost || '127.0.0.1'}:${socketPort}`.cyan)
+        `  Bridge Socket server running on ${socketHost || '127.0.0.1'}:${socketPort}`.cyan)
       logger.line('verbose', 'cyan')
     }
   )

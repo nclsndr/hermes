@@ -5,6 +5,8 @@ const createBridgeServer = require('../packages/hermes-bridge/lib/index')
 const config = require('./constants')
 
 createBridgeServer({
+  httpHost: 'localhost',
+  socketHost: 'localhost',
   httpPort: config.bridge.httpPort,
   socketPort: config.bridge.socketPort,
   loggerLevel: 'verbose',

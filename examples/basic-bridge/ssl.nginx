@@ -1,0 +1,117 @@
+# ================================
+#  BRIDGE
+# ================================
+server {
+  listen 80;
+  # Replace below (and next occurences) with your personal configuration
+  server_name bridge.yourdomain.com;
+
+  location /.well-known/acme-challenge/ {
+    # !!! Make sure this directory with write access
+    root /var/www/letsencrypt-challenge;
+  }
+  location / {
+    return 301 https://$server_name$request_uri;
+  }
+}
+
+server {
+  listen 443 ssl;
+  server_name bridge.yourdomain.com;
+
+  # !!! Make sure this directory and files exists with write access
+  access_log /var/log/bridge.yourdomain.com/access.log;
+  error_log /var/log/bridge.yourdomain.com/error.log warn;
+
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+  ssl_certificate /etc/letsencrypt/live/bridge.yourdomain.com/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/bridge.yourdomain.com/privkey.pem;
+  # ECDH
+  ssl_ecdh_curve secp384r1;
+  # Ciphers
+  ssl_ciphers EECDH+AESGCM:EECDH+AES;
+  ssl_prefer_server_ciphers on;
+  # OCSP
+  ssl_trusted_certificate /etc/letsencrypt/live/bridge.yourdomain.com/chain.pem;
+  ssl_verify_depth 3;
+  ssl_stapling on;
+  ssl_stapling_verify on;
+  # French Data Network :: open DNS
+  resolver 80.67.169.12 80.67.169.40 valid=300s;
+  resolver_timeout 5s;
+
+  ssl_session_cache shared:SSL:10m;
+  ssl_session_timeout 5m;
+
+  # Ask client to visit from https by default
+  add_header Strict-Transport-Security "max-age=15552000; preload";
+
+  location / {
+    # Replace below with your personal configuration
+    proxy_pass http://localhost:8001;
+
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+  }
+}
+
+# ================================
+#  DASHBOARD
+# ================================
+server {
+  listen 80;
+  # Replace below (and next occurences) with your personal configuration
+  server_name dashboard.yourdomain.com;
+
+  location /.well-known/acme-challenge/ {
+    # !!! Make sure this directory with write access
+    root /home/nclsndr/htdocs/dashboard.yourdomain.com;
+  }
+  location / {
+    return 301 https://$server_name$request_uri;
+  }
+}
+
+server {
+  listen 443 ssl;
+  server_name dashboard.yourdomain.com;
+
+  # !!! Make sure this directory and files exists with write access
+  access_log /var/log/dashboard.yourdomain.com/access.log;
+  error_log /var/log/dashboard.yourdomain.com/error.log warn;
+
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+  ssl_certificate /etc/letsencrypt/live/dashboard.yourdomain.com/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/dashboard.yourdomain.com/privkey.pem;
+  # ECDH
+  ssl_ecdh_curve secp384r1;
+  # Ciphers
+  ssl_ciphers EECDH+AESGCM:EECDH+AES;
+  ssl_prefer_server_ciphers on;
+  # OCSP
+  ssl_trusted_certificate /etc/letsencrypt/live/dashboard.yourdomain.com/chain.pem;
+  ssl_verify_depth 3;
+  ssl_stapling on;
+  ssl_stapling_verify on;
+  # French Data Network :: open DNS
+  resolver 80.67.169.12 80.67.169.40 valid=300s;
+  resolver_timeout 5s;
+
+  ssl_session_cache shared:SSL:10m;
+  ssl_session_timeout 5m;
+
+  # Ask client to visit from https by default
+  add_header Strict-Transport-Security "max-age=15552000; preload";
+
+  location / {
+    # Replace below with your personal configuration
+    proxy_pass http://localhost:8001;
+
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+  }
+}

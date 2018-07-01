@@ -1,0 +1,37 @@
+server {
+  listen 80;
+  # Replace below with your personal configuration
+  server_name bridge.yourdomain.com;
+
+  # !!! Make sure this directory and files exists with write access
+  # access_log /var/log/bridge.yourdomain.com/access.log;
+  # error_log /var/log/bridge.yourdomain.com/error.log warn;
+
+  location / {
+    # Replace below with your personal configuration
+    proxy_pass http://127.0.0.1:8000;
+
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+  }
+}
+server {
+  listen 80;
+  # Replace below with your personal configuration
+  server_name dashboard.your-domain.com;
+
+  access_log /var/log/nginx/access.log;
+  error_log /var/log/nginx/error.log warn;
+
+  location / {
+    # Replace below with your personal configuration
+    proxy_pass http://127.0.0.1:8001;
+
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+  }
+}

@@ -2,18 +2,20 @@
 
 ##### Listen to the outside world 🌍 from your bedroom 🛌 — 📡 HTTP request forwarding with no hassle
 
-Hermes is a dev tool designed to help teams to collaborate in the use of third party services that emit HTTP requests and need to be forwarded to the local machines.
+Hermes is a dev tool designed to help teams to collaborate in the use of third party services that emit HTTP requests and need to be forwarded to your team's local machines. It provides a multi-users alternative to [ngrok](https://github.com/nclsndr/hermes#why-not-use-ngrok) or localtunnel.
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
 ## Motivation
 
-You have an online service that need to hit your local server (e.g. webhooks). Basically, your computer is connected to your personal network (behind your NAT), so your localhost is invisible from the outside world...
+You are working on your local machine on a piece of code that need to listen from an online service — providing HTTP requests (e.g. webhooks, chatBot service...). Basically, your computer is connected to your personal network (behind your NAT), so your localhost is invisible from the outside world...
 
-Then Hermes comes and provides two modules:
+The solution is well known: you need a HTTP/SSH tunneling system that forwards the requests to your computer. It's perfect when you're alone! **But now, you are working as a team** and each developer is running his own instance of the code locally and he would like to receive the payloads also. By design tunneling systems are limited to communicate with one user at a time.
 
-- The *bridge* is running on your remote server and listen to any *provider* requests
-- The *adaptor* is running on your localhost and replicate all the requests to your *local server*
+**Here comes Hermes** and provides two modules:
+
+- The *bridge* is running on any of your servers online and listen to any *provider* requests
+- The *adaptor* is running on each local machine and replicate all the requests to the *local server*
 
 When the response is emitted from the *local server*, it brings the response back to the *provider* following the same logic.
 
@@ -26,19 +28,19 @@ This is the most basic case. It applies for a single developer working on his ma
 
 ![](https://github.com/nclsndr/hermes/blob/master/docs/assets/basic.jpg?raw=true)
 
-### Concurrency
+### Concurrent
 
 Concurrency mode allows **concurrent calls among clients** (aka Adaptors). By default, the first response received from any client (*adaptor*) will be used as the final response for the *provider*. This feature is particularly useful for teams of developers working in parallel when the provider do not require a client-specific response.
 
 ![](https://github.com/nclsndr/hermes/blob/master/docs/assets/concurrent.jpg?raw=true)
 
-#### Exclusive
+### Exclusive
 
 Exclusive mode permits to temporally **choose a single adaptor** as responsible for building the response sent to the *provider*.
 
 ![](https://github.com/nclsndr/hermes/blob/master/docs/assets/exclusive.jpg?raw=true)
 
-## Setup
+# Setup
 
 ### Requirements
 
@@ -47,7 +49,7 @@ Exclusive mode permits to temporally **choose a single adaptor** as responsible 
 ---
 ### 🌍 Bridge: Server side
 
-You need to procure any kind of server able to allow specific port access (different from 80 and 443) — you'll need 3 ports.
+You need to procure any kind of server able to allow specific port access (different from 80 and 443) — you'll need 3 available ports.
 
 > All the code snippets provided below are gathered into this [example directory](https://github.com/nclsndr/hermes/tree/master/examples/basic-bridge)
 
@@ -80,21 +82,25 @@ const responseFallback = {
 }
 
 createBridgeServer({
-  httpPort: 8000, // make sure you can access from outside of your machine
+  httpHost: 'localhost', // default '127.0.0.1'
+  httpPort: 8000, // port on which the Bridge will listen
+  socketHost: 'localhost', // default httpHost || '127.0.0.1'
   socketPort: 9000, // this port will be reused for the adaptor configuration
-  loggerLevel: 'verbose', // 'info'
   dashboard: { // for you to control your adaptors in real time
+    host: 'localhost', // default '127.0.0.1'
     port: 8001, // port to access the dashboard
     adminAuth: { // credentials to connect onto the dashboard
       username: 'admin',
-      password: 'admin', // should be placed into .env
-      jwtSecret: 'jiReKLKbTVA2qnjHun8ma2hgDcApuZ' // should be placed into .env also!
+      password: dotEnv.parsed.ADMIN_AUTH_PASSWORD, // Change it into your .env file!
+      jwtSecret: dotEnv.parsed.ADMIN_AUTH_JWT_SECRET // Change it also into your .env file!
     }
   },
+  loggerLevel: 'verbose', // 'info',
   defaultResponse: responseFallback // by default, hermes provide the fallback described above
 })
 ```
 
+**Notes:** If you plan to not use any internal routing system (Apache, Nginx...), you should set `httpHost`, `socketHost`, `dashboard.host` to `'0.0.0.0'` to expose your Bridge and Dashboard to the world.
 
 #### 4. 🚀 Launch it!
 
@@ -110,7 +116,7 @@ $ node index.js
 - DNS resolution for the socket endpoint is possible but not as easy as it seems. We recommend to use the IP for configuring the adaptor.
 - [Heroku](https://www.heroku.com/) users, as far as the service doesn't allow multi-port exposure, hermes-bridge will not be compatible.
 
-#### 5. 🖥 Dashboard: register your Adaptor(s)
+#### 5. Dashboard: register your Adaptor(s)
 
 Navigate to the URL (or IP:port) you set up for your Hermes *dashboard*. You should have something like:
 
@@ -125,7 +131,7 @@ You can now add a new *adaptor* with the auth token of your choice — you will 
 
 ---
 
-### 🛌 Adaptor: Local dev env
+### 🛌 Adaptor: Your (local) development environment
 The adaptor can be set in any dev environment that support NodeJS 8+.
 
 > All the information provided here are gathered into this [example directory](https://github.com/nclsndr/hermes/tree/master/examples/basic-adaptor)
@@ -145,8 +151,8 @@ Create a `hermes.js` file.
 const adaptor = require('hermes-adaptor')
 
 adaptor.init({
-  bridgeHost: 'my-hermes-bridge-domain.com',
-  bridgeSocketPort: 9000,
+  bridgeHost: 'YOUR_SERVER_IP', // if set to 0.0.0.0 in the Bridge config
+  bridgeSocketPort: 9000, // the port you chose previously
   localServerProtocol: 'http',
   localServerHost: 'localhost',
   localServerPort: 8888,
@@ -170,7 +176,7 @@ You need to launch your local server too if you want the all system to do his jo
 **Notes**
 
 - We recommend to use [concurrently](https://www.npmjs.com/package/concurrently) in order to start your dev-server in parallel with the adaptor
-- For setup testing, you can try a `curl http://my-bridge.com`, then you should receive the request on your adaptor console (verbose = true).
+- For testing your setup, you can try a `curl http://YOUR_SERVER_IP:YOUR_HTTP_PORT`, then you should receive the request on your adaptor console (verbose = true).
 
 Here you should have something like:
 

@@ -4,8 +4,8 @@
 const createAdaptor = require('hermes-adaptor')
 
 createAdaptor({
-  bridgeHost: 'my-hermes-bridge-domain.com', // NB without http://
-  bridgeSocketPort: 9000,
+  bridgeHost: 'YOUR_SERVER_IP', // NB without http:// | if set to 0.0.0.0 in the Bridge config
+  bridgeSocketPort: 9000, // the port you chose previously
   localServerProtocol: 'http',
   localServerHost: 'localhost',
   localServerPort: 8888,

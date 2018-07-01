@@ -32,7 +32,7 @@ const createServer = (initialConfig = {}) => {
 
   registerGlobals(['JWT_SECRET', config.adminAuth.jwtSecret])
 
-  const { port } = config
+  const { host, port } = config
 
   const app = express()
   const server = http.Server(app)
@@ -42,9 +42,9 @@ const createServer = (initialConfig = {}) => {
 
   app.use(createDashboardRouter())
 
-  server.listen(port, () => {
+  server.listen({ host, port }, () => {
     logger.line('info', 'cyan')
-    logger.info(`Backend server running on port: ${port}`.cyan)
+    logger.info(`  Dashboard server running on port: ${host}:${port}`.cyan)
     logger.line('info', 'cyan')
   })
   return {

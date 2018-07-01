@@ -2,13 +2,13 @@
   "name": "hermes-dashboard",
   "version": "1.0.0",
   "description": "Hermes dashboard front-end",
-  "homepage": "https://github.com/chance-get-yours/hermes",
+  "homepage": "https://github.com/nclsndr/hermes",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chance-get-yours/hermes"
+    "url": "https://github.com/nclsndr/hermes"
   },
   "bugs": {
-    "url": "https://github.com/chance-get-yours/hermes/issues",
+    "url": "https://github.com/nclsndr/hermes/issues",
     "email": "open-source@chance.co"
   },
   "author": "nclsndr <nclsndr1@gmail.com>",
